@@ -1,14 +1,17 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11134" systemVersion="15F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11201" systemVersion="16E195" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11106"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11161"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
+        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
         <!--View Controller-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="ViewController" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="SpaceBear" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
                         <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
@@ -16,11 +19,90 @@
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fx4-G1-dtk">
+                                <subviews>
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="globe" translatesAutoresizingMaskIntoConstraints="NO" id="GyL-Xq-pKU">
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="222" id="Qvt-8q-g4i"/>
+                                            <constraint firstAttribute="width" secondItem="GyL-Xq-pKU" secondAttribute="height" multiplier="1:1" id="XbG-md-WHj"/>
+                                        </constraints>
+                                    </imageView>
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="astronaut" translatesAutoresizingMaskIntoConstraints="NO" id="Lx5-yW-ZHN">
+                                        <constraints>
+                                            <constraint firstAttribute="width" secondItem="Lx5-yW-ZHN" secondAttribute="height" id="Xg0-0J-kUc"/>
+                                        </constraints>
+                                    </imageView>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstItem="Lx5-yW-ZHN" firstAttribute="width" secondItem="GyL-Xq-pKU" secondAttribute="height" multiplier="1:4" id="Ezm-NO-BfI"/>
+                                    <constraint firstItem="Lx5-yW-ZHN" firstAttribute="centerX" secondItem="GyL-Xq-pKU" secondAttribute="centerX" id="VWe-JG-nSJ"/>
+                                    <constraint firstItem="GyL-Xq-pKU" firstAttribute="centerX" secondItem="fx4-G1-dtk" secondAttribute="centerX" id="cp5-kg-jLD"/>
+                                    <constraint firstItem="GyL-Xq-pKU" firstAttribute="centerY" secondItem="fx4-G1-dtk" secondAttribute="centerY" id="lst-qQ-lAc"/>
+                                    <constraint firstItem="Lx5-yW-ZHN" firstAttribute="centerY" secondItem="GyL-Xq-pKU" secondAttribute="centerY" id="rMb-N3-3HY"/>
+                                </constraints>
+                            </view>
+                            <stackView opaque="NO" contentMode="scaleToFill" spacing="50" translatesAutoresizingMaskIntoConstraints="NO" id="nDW-CH-yUG">
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mJG-yM-Uek">
+                                        <color key="backgroundColor" red="0.20000000300000001" green="0.20000000300000001" blue="0.20000000300000001" alpha="1" colorSpace="calibratedRGB"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="200" id="U8Y-DW-WTV">
+                                                <variation key="widthClass=compact" constant="100"/>
+                                            </constraint>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                        <state key="normal" title="START">
+                                            <color key="titleColor" red="0.90196079019999997" green="0.90196079019999997" blue="0.90196079019999997" alpha="1" colorSpace="calibratedRGB"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="startPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="y8t-pp-FPf"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2uO-Wq-R9Z">
+                                        <color key="backgroundColor" red="0.20000000300000001" green="0.20000000300000001" blue="0.20000000300000001" alpha="1" colorSpace="calibratedRGB"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="200" id="ai2-wp-rri">
+                                                <variation key="widthClass=compact" constant="100"/>
+                                            </constraint>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                        <state key="normal" title="STOP">
+                                            <color key="titleColor" red="0.90196079019999997" green="0.90196079019999997" blue="0.90196079019999997" alpha="1" colorSpace="calibratedRGB"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="stopPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="FPZ-BW-KXr"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <variation key="widthClass=regular" spacing="100"/>
+                            </stackView>
+                        </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="fx4-G1-dtk" firstAttribute="height" secondItem="8bC-Xf-vdC" secondAttribute="height" multiplier="0.75" id="FEX-6r-lbK"/>
+                            <constraint firstItem="nDW-CH-yUG" firstAttribute="top" secondItem="fx4-G1-dtk" secondAttribute="bottom" id="Qsz-dK-7AP"/>
+                            <constraint firstItem="fx4-G1-dtk" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="YUe-t9-jaT"/>
+                            <constraint firstItem="fx4-G1-dtk" firstAttribute="width" secondItem="8bC-Xf-vdC" secondAttribute="width" id="ePe-MM-uys"/>
+                            <constraint firstItem="nDW-CH-yUG" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="iK7-pb-EKc"/>
+                            <constraint firstItem="fx4-G1-dtk" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="mFs-60-1PE"/>
+                        </constraints>
                     </view>
+                    <connections>
+                        <outlet property="astronaut" destination="Lx5-yW-ZHN" id="h0f-Zw-HlW"/>
+                        <outlet property="globe" destination="GyL-Xq-pKU" id="dCR-mW-eQ2"/>
+                        <outlet property="globeWidth" destination="Qvt-8q-g4i" id="42a-59-f38"/>
+                        <outlet property="sceneView" destination="fx4-G1-dtk" id="gaQ-w5-fdo"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
+            <point key="canvasLocation" x="116.25" y="121.47887323943662"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="astronaut" width="300" height="297"/>
+        <image name="globe" width="2400" height="2400"/>
+    </resources>
 </document>
