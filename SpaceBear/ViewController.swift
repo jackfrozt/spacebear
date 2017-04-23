@@ -13,35 +13,54 @@ fileprivate enum Direction: CGFloat {
     case counterClockwise = -1
 }
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, CAAnimationDelegate {
     
     // --- settings ---
    
     // the speed of the rotation
-    private let secondsPerRevolution: Double = 2
+    private let secondsPerRevolution: Double = 16
+
+    // the size of the globe, as a ratio to scene width or scene height, which ever is smaller.
+    private let globeSize: CGFloat = 0.5
     
     // the distance between the astronaut and the globe, where 1 unit = height of the astronaut
-    private let distanceInSpace: CGFloat = 1.2
+    private let distanceInSpace: CGFloat = 0.8
 
-    // not implemented yet
     // true means the spinning animation has a gradual acceration before hitting target speed,
     // and gradual deceleration to a stop.
-    private let isSmoothStartAndStop = false
+    private let isSmoothStartAndStop = true
 
     private let direction: Direction = .clockwise
-    // end of settings
+    
+    // --- end of settings ---
+    
     
     private let rotateAstronautAnimationKey = "rotateAstronautAnimationKey"
+    private let accelAnimationKey = "accelAnimationKey"
+    private let decelAnimationKey = "decelAnimationKey"
+    
+    // animation ID used for identifying in animationDidStop callback
+    private let animationIDKey = "animationIDKey"
+    private let accelAnimationID = "accelAnimationID"
+    private let decelAnimationID = "decelAnimationID"
+    
     private var currentRotation: CGFloat = 0
     
     @IBOutlet weak var sceneView: UIView!
     @IBOutlet weak var astronaut: UIImageView!
     @IBOutlet weak var globe: UIImageView!
     @IBOutlet weak var globeWidth: NSLayoutConstraint!
+    @IBOutlet weak var startButton: UIButton!
+    @IBOutlet weak var stopButton: UIButton!
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         updateAstronautPositionOnLayout()
+        disable(stopButton)
     }
     
     override func viewDidLayoutSubviews() {
@@ -49,10 +68,12 @@ class ViewController: UIViewController {
     }
     
     @IBAction func startPressed(_ sender: AnyObject) {
+        disable(startButton)
         startSpin()
     }
     
     @IBAction func stopPressed(_ sender: AnyObject) {
+        disable(stopButton)
         stopSpin()
     }
     
@@ -68,51 +89,104 @@ class ViewController: UIViewController {
         let offset = globesEdge + distanceInSpace
         astronaut.layer.anchorPoint = CGPoint(x: 0.5 + offset, y: 0.5)
         
+        // set the size of the globe
         // the globe's position is set via autolayout
         // the height of the globe depends on the dimension of the scene view.
-        
-        globeWidth.constant = min(sceneView.bounds.size.width, sceneView.bounds.size.height) * 0.4
+        globeWidth.constant = min(sceneView.bounds.size.width, sceneView.bounds.size.height) * globeSize
     }
     
     private func startSpin() {
         if (isSmoothStartAndStop) {
-            // not implemented
+            currentRotation = astronaut.layer.presentation()?.value(forKeyPath: "transform.rotation.z") as! CGFloat
+            
+            let accelAnim = CABasicAnimation(keyPath: "transform.rotation.z")
+            accelAnim.setValue(accelAnimationID, forKey: animationIDKey)
+            accelAnim.delegate = self
+            accelAnim.fromValue = currentRotation
+            accelAnim.toValue = currentRotation + (CGFloat.pi / 2 * direction.rawValue)
+            astronaut.layer.setValue(accelAnim.toValue, forKeyPath: "transform.rotation.z")
+            accelAnim.duration = secondsPerRevolution / 3.5
+            accelAnim.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseIn)
+            astronaut.layer.add(accelAnim, forKey: accelAnimationKey)
+            
         } else {
-            if astronaut.layer.animation(forKey: rotateAstronautAnimationKey) == nil {
-                let animation = CABasicAnimation(keyPath: "transform.rotation.z")
-                animation.fromValue = currentRotation
-                animation.toValue = currentRotation + (CGFloat.pi * 2 * direction.rawValue)
-                animation.repeatCount = .infinity
-                animation.duration = secondsPerRevolution
-                astronaut.layer.add(animation, forKey: rotateAstronautAnimationKey)
-            }
+            spinAstronautFullSpeedFromCurrentLocation()
+            enable(stopButton)
         }
     }
     
     private func stopSpin() {
         if (isSmoothStartAndStop) {
-            // not implemented
+            currentRotation = astronaut.layer.presentation()?.value(forKeyPath: "transform.rotation.z") as! CGFloat
+            astronaut.layer.removeAnimation(forKey: accelAnimationKey)
+            astronaut.layer.removeAnimation(forKey: rotateAstronautAnimationKey)
+            
+            // decelerate
+            let decelAnim = CABasicAnimation(keyPath: "transform.rotation.z")
+            decelAnim.setValue(decelAnimationID, forKeyPath: animationIDKey)
+            decelAnim.delegate = self
+            decelAnim.fromValue = currentRotation
+            decelAnim.toValue = currentRotation + (CGFloat.pi / 4 * direction.rawValue)
+            astronaut.layer.setValue(decelAnim.toValue, forKeyPath: "transform.rotation.z")
+            decelAnim.duration = secondsPerRevolution / 5
+            decelAnim.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseOut)
+            astronaut.layer.add(decelAnim, forKey: decelAnimationKey)
+            
         } else {
             currentRotation = astronaut.layer.presentation()?.value(forKeyPath: "transform.rotation.z") as! CGFloat
             astronaut.layer.removeAnimation(forKey: rotateAstronautAnimationKey)
             astronaut.layer.setValue(currentRotation, forKeyPath: "transform.rotation.z")
+            
+            enable(startButton)
         }
     }
     
-    // alternatively, these methods could be used to pause and unpause the animation
-//    private func pauseAnimation(_ layer:CALayer){
-//        let pausedTime = layer.convertTime(CACurrentMediaTime(), from: nil)
-//        layer.speed = 0.0
-//        layer.timeOffset = pausedTime
-//    }
-//    
-//    private func resumeAnimation(_ layer:CALayer){
-//        let pausedTime = layer.timeOffset
-//        layer.speed = 1.0
-//        layer.timeOffset = 0.0
-//        layer.beginTime = 0.0
-//        let timeSincePause = layer.convertTime(CACurrentMediaTime(), from: nil) - pausedTime
-//        layer.beginTime = timeSincePause
-//    }
-
+    private func spinAstronautFullSpeedFromCurrentLocation() {
+        guard astronaut.layer.animation(forKey: rotateAstronautAnimationKey) == nil else {
+            return
+        }
+        
+        let animation = CABasicAnimation(keyPath: "transform.rotation.z")
+        animation.fromValue = currentRotation
+        animation.toValue = currentRotation + (CGFloat.pi * 2 * direction.rawValue)
+        animation.repeatCount = .infinity
+        animation.duration = secondsPerRevolution
+        astronaut.layer.add(animation, forKey: rotateAstronautAnimationKey)
+    }
+    
+    private func enable(_ button: UIButton) {
+        button.isEnabled = true
+        button.alpha = 1
+    }
+    
+    private func disable(_ button: UIButton) {
+        button.isEnabled = false
+        button.alpha = 0.4
+    }
+    
+    // CAAnimationDelegate
+    func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
+        if flag {
+            if let id = anim.value(forKey: animationIDKey) as? String {
+                switch id {
+                case accelAnimationID:
+                    currentRotation = self.astronaut.layer.value(forKeyPath: "transform.rotation.z") as! CGFloat
+                    
+                    // acceleration has finished
+                    spinAstronautFullSpeedFromCurrentLocation()
+                    
+                    // allow stopping
+                    enable(stopButton)
+                    
+                case decelAnimationID:
+                    enable(startButton)
+                    
+                default:
+                    break
+                }
+            }
+        }
+    }
+    
+    
 }

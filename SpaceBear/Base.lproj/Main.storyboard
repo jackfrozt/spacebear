@@ -34,7 +34,7 @@
                                         </constraints>
                                     </imageView>
                                 </subviews>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                 <constraints>
                                     <constraint firstItem="Lx5-yW-ZHN" firstAttribute="width" secondItem="GyL-Xq-pKU" secondAttribute="height" multiplier="1:4" id="Ezm-NO-BfI"/>
                                     <constraint firstItem="Lx5-yW-ZHN" firstAttribute="centerX" secondItem="GyL-Xq-pKU" secondAttribute="centerX" id="VWe-JG-nSJ"/>
@@ -46,31 +46,43 @@
                             <stackView opaque="NO" contentMode="scaleToFill" spacing="50" translatesAutoresizingMaskIntoConstraints="NO" id="nDW-CH-yUG">
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mJG-yM-Uek">
-                                        <color key="backgroundColor" red="0.20000000300000001" green="0.20000000300000001" blue="0.20000000300000001" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="backgroundColor" red="0.37254901960784315" green="0.47450980392156861" blue="0.50588235294117645" alpha="1" colorSpace="calibratedRGB"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="200" id="U8Y-DW-WTV">
                                                 <variation key="widthClass=compact" constant="100"/>
                                             </constraint>
+                                            <constraint firstAttribute="height" constant="40" id="Y9i-NN-FY4"/>
                                         </constraints>
                                         <fontDescription key="fontDescription" type="system" pointSize="20"/>
-                                        <state key="normal" title="START">
-                                            <color key="titleColor" red="0.90196079019999997" green="0.90196079019999997" blue="0.90196079019999997" alpha="1" colorSpace="calibratedRGB"/>
+                                        <state key="normal" title="Start">
+                                            <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                         </state>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                <integer key="value" value="5"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
                                         <connections>
                                             <action selector="startPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="y8t-pp-FPf"/>
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2uO-Wq-R9Z">
-                                        <color key="backgroundColor" red="0.20000000300000001" green="0.20000000300000001" blue="0.20000000300000001" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="backgroundColor" red="0.37254901960784315" green="0.47450980392156861" blue="0.50588235294117645" alpha="1" colorSpace="calibratedRGB"/>
                                         <constraints>
+                                            <constraint firstAttribute="height" constant="40" id="1dp-0b-Dpn"/>
                                             <constraint firstAttribute="width" constant="200" id="ai2-wp-rri">
                                                 <variation key="widthClass=compact" constant="100"/>
                                             </constraint>
                                         </constraints>
                                         <fontDescription key="fontDescription" type="system" pointSize="20"/>
-                                        <state key="normal" title="STOP">
-                                            <color key="titleColor" red="0.90196079019999997" green="0.90196079019999997" blue="0.90196079019999997" alpha="1" colorSpace="calibratedRGB"/>
+                                        <state key="normal" title="Stop">
+                                            <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                         </state>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                <integer key="value" value="5"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
                                         <connections>
                                             <action selector="stopPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="FPZ-BW-KXr"/>
                                         </connections>
@@ -79,7 +91,7 @@
                                 <variation key="widthClass=regular" spacing="100"/>
                             </stackView>
                         </subviews>
-                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="backgroundColor" red="0.18431372549019609" green="0.2627450980392157" blue="0.29019607843137252" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="fx4-G1-dtk" firstAttribute="height" secondItem="8bC-Xf-vdC" secondAttribute="height" multiplier="0.75" id="FEX-6r-lbK"/>
                             <constraint firstItem="nDW-CH-yUG" firstAttribute="top" secondItem="fx4-G1-dtk" secondAttribute="bottom" id="Qsz-dK-7AP"/>
@@ -94,6 +106,8 @@
                         <outlet property="globe" destination="GyL-Xq-pKU" id="dCR-mW-eQ2"/>
                         <outlet property="globeWidth" destination="Qvt-8q-g4i" id="42a-59-f38"/>
                         <outlet property="sceneView" destination="fx4-G1-dtk" id="gaQ-w5-fdo"/>
+                        <outlet property="startButton" destination="mJG-yM-Uek" id="gQz-RI-0hz"/>
+                        <outlet property="stopButton" destination="2uO-Wq-R9Z" id="VaM-EI-ASd"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
