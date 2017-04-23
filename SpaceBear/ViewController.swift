@@ -18,7 +18,7 @@ class ViewController: UIViewController, CAAnimationDelegate {
     // --- settings ---
    
     // the speed of the rotation
-    private let secondsPerRevolution: Double = 16
+    private let secondsPerRevolution: Double = 10
 
     // the size of the globe, as a ratio to scene width or scene height, which ever is smaller.
     private let globeSize: CGFloat = 0.5
@@ -53,6 +53,11 @@ class ViewController: UIViewController, CAAnimationDelegate {
     @IBOutlet weak var startButton: UIButton!
     @IBOutlet weak var stopButton: UIButton!
     
+    @IBOutlet weak var astronautGroupView: UIView!
+    @IBOutlet weak var lowerJet: UIImageView!
+    @IBOutlet weak var upperJetLeft: UIImageView!
+    @IBOutlet weak var upperJetRight: UIImageView!
+    
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
     }
@@ -61,6 +66,17 @@ class ViewController: UIViewController, CAAnimationDelegate {
         super.viewDidLoad()
         updateAstronautPositionOnLayout()
         disable(stopButton)
+        
+        // set up the jets animations
+        // the jets have an image in IB as placeholder, clear it to nil.
+        lowerJet.image = nil
+        upperJetLeft.image = nil
+        upperJetRight.image = nil
+        
+        lowerJet.animationImages = [#imageLiteral(resourceName: "jets1"), #imageLiteral(resourceName: "jets2"), #imageLiteral(resourceName: "jets3"), #imageLiteral(resourceName: "jets4")]
+        upperJetLeft.animationImages = [#imageLiteral(resourceName: "jets2"), #imageLiteral(resourceName: "jets3"), #imageLiteral(resourceName: "jets4"), #imageLiteral(resourceName: "jets1")]
+        upperJetRight.animationImages = [#imageLiteral(resourceName: "jets4"), #imageLiteral(resourceName: "jets1"), #imageLiteral(resourceName: "jets2"), #imageLiteral(resourceName: "jets3")]
+        
     }
     
     override func viewDidLayoutSubviews() {
@@ -82,12 +98,12 @@ class ViewController: UIViewController, CAAnimationDelegate {
         // The anchor point of the astronaut needs to be offset so that when a rotation is applied,
         // it flys around the glob.
         
-        let astronautToGlobeSizeRatio = self.astronaut.bounds.size.width / globe.bounds.size.width
+        let astronautToGlobeSizeRatio = self.astronautGroupView.bounds.size.width / globe.bounds.size.width
 
         // half of the height of the astronaut, plus however many times the height of the astronaut to get half a globe
         let globesEdge: CGFloat = 0.5 + ((1 / astronautToGlobeSizeRatio) / 2)
         let offset = globesEdge + distanceInSpace
-        astronaut.layer.anchorPoint = CGPoint(x: 0.5 + offset, y: 0.5)
+        astronautGroupView.layer.anchorPoint = CGPoint(x: 0.5 + offset, y: 0.5)
         
         // set the size of the globe
         // the globe's position is set via autolayout
@@ -97,17 +113,25 @@ class ViewController: UIViewController, CAAnimationDelegate {
     
     private func startSpin() {
         if (isSmoothStartAndStop) {
-            currentRotation = astronaut.layer.presentation()?.value(forKeyPath: "transform.rotation.z") as! CGFloat
+            currentRotation = astronautGroupView.layer.presentation()?.value(forKeyPath: "transform.rotation.z") as! CGFloat
             
             let accelAnim = CABasicAnimation(keyPath: "transform.rotation.z")
             accelAnim.setValue(accelAnimationID, forKey: animationIDKey)
             accelAnim.delegate = self
             accelAnim.fromValue = currentRotation
             accelAnim.toValue = currentRotation + (CGFloat.pi / 2 * direction.rawValue)
-            astronaut.layer.setValue(accelAnim.toValue, forKeyPath: "transform.rotation.z")
+            astronautGroupView.layer.setValue(accelAnim.toValue, forKeyPath: "transform.rotation.z")
             accelAnim.duration = secondsPerRevolution / 3.5
             accelAnim.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseIn)
-            astronaut.layer.add(accelAnim, forKey: accelAnimationKey)
+            astronautGroupView.layer.add(accelAnim, forKey: accelAnimationKey)
+            
+            switch direction {
+            case .clockwise:
+                lowerJet.startAnimating()
+            case .counterClockwise:
+                upperJetLeft.startAnimating()
+                upperJetRight.startAnimating()
+            }
             
         } else {
             spinAstronautFullSpeedFromCurrentLocation()
@@ -117,9 +141,9 @@ class ViewController: UIViewController, CAAnimationDelegate {
     
     private func stopSpin() {
         if (isSmoothStartAndStop) {
-            currentRotation = astronaut.layer.presentation()?.value(forKeyPath: "transform.rotation.z") as! CGFloat
-            astronaut.layer.removeAnimation(forKey: accelAnimationKey)
-            astronaut.layer.removeAnimation(forKey: rotateAstronautAnimationKey)
+            currentRotation = astronautGroupView.layer.presentation()?.value(forKeyPath: "transform.rotation.z") as! CGFloat
+            astronautGroupView.layer.removeAnimation(forKey: accelAnimationKey)
+            astronautGroupView.layer.removeAnimation(forKey: rotateAstronautAnimationKey)
             
             // decelerate
             let decelAnim = CABasicAnimation(keyPath: "transform.rotation.z")
@@ -127,22 +151,30 @@ class ViewController: UIViewController, CAAnimationDelegate {
             decelAnim.delegate = self
             decelAnim.fromValue = currentRotation
             decelAnim.toValue = currentRotation + (CGFloat.pi / 4 * direction.rawValue)
-            astronaut.layer.setValue(decelAnim.toValue, forKeyPath: "transform.rotation.z")
+            astronautGroupView.layer.setValue(decelAnim.toValue, forKeyPath: "transform.rotation.z")
             decelAnim.duration = secondsPerRevolution / 5
             decelAnim.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseOut)
-            astronaut.layer.add(decelAnim, forKey: decelAnimationKey)
+            astronautGroupView.layer.add(decelAnim, forKey: decelAnimationKey)
+            
+            switch direction {
+            case .clockwise:
+                upperJetLeft.startAnimating()
+                upperJetRight.startAnimating()
+            case .counterClockwise:
+                lowerJet.startAnimating()
+            }
             
         } else {
-            currentRotation = astronaut.layer.presentation()?.value(forKeyPath: "transform.rotation.z") as! CGFloat
-            astronaut.layer.removeAnimation(forKey: rotateAstronautAnimationKey)
-            astronaut.layer.setValue(currentRotation, forKeyPath: "transform.rotation.z")
+            currentRotation = astronautGroupView.layer.presentation()?.value(forKeyPath: "transform.rotation.z") as! CGFloat
+            astronautGroupView.layer.removeAnimation(forKey: rotateAstronautAnimationKey)
+            astronautGroupView.layer.setValue(currentRotation, forKeyPath: "transform.rotation.z")
             
             enable(startButton)
         }
     }
     
     private func spinAstronautFullSpeedFromCurrentLocation() {
-        guard astronaut.layer.animation(forKey: rotateAstronautAnimationKey) == nil else {
+        guard astronautGroupView.layer.animation(forKey: rotateAstronautAnimationKey) == nil else {
             return
         }
         
@@ -151,7 +183,7 @@ class ViewController: UIViewController, CAAnimationDelegate {
         animation.toValue = currentRotation + (CGFloat.pi * 2 * direction.rawValue)
         animation.repeatCount = .infinity
         animation.duration = secondsPerRevolution
-        astronaut.layer.add(animation, forKey: rotateAstronautAnimationKey)
+        astronautGroupView.layer.add(animation, forKey: rotateAstronautAnimationKey)
     }
     
     private func enable(_ button: UIButton) {
@@ -170,9 +202,18 @@ class ViewController: UIViewController, CAAnimationDelegate {
             if let id = anim.value(forKey: animationIDKey) as? String {
                 switch id {
                 case accelAnimationID:
-                    currentRotation = self.astronaut.layer.value(forKeyPath: "transform.rotation.z") as! CGFloat
+                    currentRotation = self.astronautGroupView.layer.value(forKeyPath: "transform.rotation.z") as! CGFloat
                     
                     // acceleration has finished
+                    
+                    switch direction {
+                    case .clockwise:
+                        lowerJet.stopAnimating()
+                    case .counterClockwise:
+                        upperJetLeft.stopAnimating()
+                        upperJetRight.stopAnimating()
+                    }
+                    
                     spinAstronautFullSpeedFromCurrentLocation()
                     
                     // allow stopping
@@ -181,6 +222,13 @@ class ViewController: UIViewController, CAAnimationDelegate {
                 case decelAnimationID:
                     enable(startButton)
                     
+                    switch direction {
+                    case .clockwise:
+                        upperJetLeft.stopAnimating()
+                        upperJetRight.stopAnimating()
+                    case .counterClockwise:
+                        lowerJet.stopAnimating()
+                    }
                 default:
                     break
                 }
