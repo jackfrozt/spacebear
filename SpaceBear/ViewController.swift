@@ -66,7 +66,7 @@ class ViewController: UIViewController, CAAnimationDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        updateAstronautPositionOnLayout()
+        updatePositions()
         disable(stopButton)
         
         // set up the jets animations
@@ -82,7 +82,7 @@ class ViewController: UIViewController, CAAnimationDelegate {
     }
     
     override func viewDidLayoutSubviews() {
-        updateAstronautPositionOnLayout()
+        updatePositions()
     }
     
     @IBAction func startPressed(_ sender: AnyObject) {
@@ -95,7 +95,7 @@ class ViewController: UIViewController, CAAnimationDelegate {
         stopSpin()
     }
     
-    private func updateAstronautPositionOnLayout() {
+    private func updatePositions() {
         // The astronaut view is placed at the center of the globe via autolayout.
         // The anchor point of the astronaut needs to be offset so that when a rotation is applied,
         // it flys around the glob.
