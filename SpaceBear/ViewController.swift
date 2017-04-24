@@ -19,18 +19,18 @@ class ViewController: UIViewController, CAAnimationDelegate {
    
     // the speed of the rotation
     private let secondsPerRevolution: TimeInterval = 6
-
+    
+    // The spinning animation can have a gradual acceration before hitting target speed,
+    // and gradual deceleration to a stop. During this time, jets fire, and controls are disabled.
+    private let accelerationDuration: TimeInterval = 1.5
+    private let decelerationDuration: TimeInterval = 1.8
+    
     // the size of the globe image, as a ratio to view's width or scene's height, which ever is smaller.
     // the scene's height is from the top of the screen to the top of the buttons.
     private let globeSize: CGFloat = 0.5
     
     // the distance between the astronaut and the globe image, where 1 unit = height of the astronaut
     private let distanceInSpace: CGFloat = 0.6
-
-    // The spinning animation can have a gradual acceration before hitting target speed,
-    // and gradual deceleration to a stop. During this time, jets fire, and controls are disabled.
-    private let accelerationDuration: TimeInterval = 1.5
-    private let decelerationDuration: TimeInterval = 1.8
 
     private let direction: Direction = .clockwise
     
