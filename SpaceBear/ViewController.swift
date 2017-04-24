@@ -18,17 +18,19 @@ class ViewController: UIViewController, CAAnimationDelegate {
     // --- settings ---
    
     // the speed of the rotation
-    private let secondsPerRevolution: Double = 10
+    private let secondsPerRevolution: TimeInterval = 6
 
-    // the size of the globe, as a ratio to scene width or scene height, which ever is smaller.
+    // the size of the globe image, as a ratio to view's width or scene's height, which ever is smaller.
+    // the scene's height is from the top of the screen to the top of the buttons.
     private let globeSize: CGFloat = 0.5
     
-    // the distance between the astronaut and the globe, where 1 unit = height of the astronaut
-    private let distanceInSpace: CGFloat = 0.8
+    // the distance between the astronaut and the globe image, where 1 unit = height of the astronaut
+    private let distanceInSpace: CGFloat = 0.6
 
-    // true means the spinning animation has a gradual acceration before hitting target speed,
-    // and gradual deceleration to a stop.
-    private let isSmoothStartAndStop = true
+    // The spinning animation can have a gradual acceration before hitting target speed,
+    // and gradual deceleration to a stop. During this time, jets fire, and controls are disabled.
+    private let accelerationDuration: TimeInterval = 1.5
+    private let decelerationDuration: TimeInterval = 1.8
 
     private let direction: Direction = .clockwise
     
@@ -112,16 +114,38 @@ class ViewController: UIViewController, CAAnimationDelegate {
     }
     
     private func startSpin() {
-        if (isSmoothStartAndStop) {
+        if (accelerationDuration > 0) {
+            /* 
+             Acceleration is animated using CAAnimation with an ease-in.
+             The continuous spin after acceleration is created in animationDidStop.
+             
+             The duration, speed and starting value are known,
+             but the distance needed to get up to speed needs to be calculated.
+             
+             Let's start with the distance as if there were no acceleration.
+             distance = time * speed
+                      = (accelerationDuration * (2*Pi / secondsPerRevolution))
+             
+             kCAMediaTimingFunctionEaseIn is used for acceleration,
+             and the velocity at the end of that animation needs to match the desired speed.
+             The ease-in bezier curve has the control points (0.42,0.0) and (1.0,1.0).
+             The slope at the end of that curve is 1.72414, which means
+             it is 1.72414 times faster than it needs to be.
+             To make the ease-in end in the desired speed, 
+             the distance needs to be 1.72414 times shorter.
+             */
+            
+            let accelDistance = CGFloat((accelerationDuration * (2 * Double.pi / secondsPerRevolution)) / 1.72414)
+            
             currentRotation = astronautGroupView.layer.presentation()?.value(forKeyPath: "transform.rotation.z") as! CGFloat
             
             let accelAnim = CABasicAnimation(keyPath: "transform.rotation.z")
             accelAnim.setValue(accelAnimationID, forKey: animationIDKey)
             accelAnim.delegate = self
             accelAnim.fromValue = currentRotation
-            accelAnim.toValue = currentRotation + (CGFloat.pi / 2 * direction.rawValue)
+            accelAnim.toValue = currentRotation + (accelDistance * direction.rawValue)
             astronautGroupView.layer.setValue(accelAnim.toValue, forKeyPath: "transform.rotation.z")
-            accelAnim.duration = secondsPerRevolution / 3.5
+            accelAnim.duration = accelerationDuration
             accelAnim.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseIn)
             astronautGroupView.layer.add(accelAnim, forKey: accelAnimationKey)
             
@@ -140,19 +164,25 @@ class ViewController: UIViewController, CAAnimationDelegate {
     }
     
     private func stopSpin() {
-        if (isSmoothStartAndStop) {
+        if (decelerationDuration > 0) {
             currentRotation = astronautGroupView.layer.presentation()?.value(forKeyPath: "transform.rotation.z") as! CGFloat
-            astronautGroupView.layer.removeAnimation(forKey: accelAnimationKey)
             astronautGroupView.layer.removeAnimation(forKey: rotateAstronautAnimationKey)
             
-            // decelerate
+            /*
+             decelerate using kCAMediaTimingFunctionEaseOut
+             which has an bezier curve with control points (0.0,0.0) and (0.58,1.0),
+             similar to the acceleration animation.
+             */
+            
+            let decelDistance = CGFloat((decelerationDuration * (2 * Double.pi / secondsPerRevolution)) / 1.72414)
+            
             let decelAnim = CABasicAnimation(keyPath: "transform.rotation.z")
             decelAnim.setValue(decelAnimationID, forKeyPath: animationIDKey)
             decelAnim.delegate = self
             decelAnim.fromValue = currentRotation
-            decelAnim.toValue = currentRotation + (CGFloat.pi / 4 * direction.rawValue)
+            decelAnim.toValue = currentRotation + (decelDistance * direction.rawValue)
             astronautGroupView.layer.setValue(decelAnim.toValue, forKeyPath: "transform.rotation.z")
-            decelAnim.duration = secondsPerRevolution / 5
+            decelAnim.duration = decelerationDuration
             decelAnim.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseOut)
             astronautGroupView.layer.add(decelAnim, forKey: decelAnimationKey)
             
