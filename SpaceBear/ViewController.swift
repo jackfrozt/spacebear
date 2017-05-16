@@ -18,11 +18,11 @@ class ViewController: UIViewController, CAAnimationDelegate {
     // --- settings ---
    
     // the speed of the rotation
-    private let secondsPerRevolution: TimeInterval = 6
+    private let secondsPerRevolution: TimeInterval = 10
     
     // The spinning animation can have a gradual acceration before hitting target speed,
     // and gradual deceleration to a stop. During this time, jets fire, and controls are disabled.
-    private let accelerationDuration: TimeInterval = 1.5
+    private let accelerationDuration: TimeInterval = 2.5
     private let decelerationDuration: TimeInterval = 1.8
     
     // the size of the globe image, as a ratio to view's width or scene's height, which ever is smaller.
